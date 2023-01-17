@@ -3,5 +3,5 @@
 ## Usage
 
 ```shell
-npx umami-migrate-v1-v2
+npx @umami/migrate-v1-v2
 ```
