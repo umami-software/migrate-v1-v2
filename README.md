@@ -1,4 +1,4 @@
-# umami-migrate-v1-v2
+# @umami/migrate-v1-v2
 
 ## Usage
 
