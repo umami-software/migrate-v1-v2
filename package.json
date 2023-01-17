@@ -1,0 +1,24 @@
+{
+  "name": "@umami/migrate-v1-v2",
+  "version": "0.1.0",
+  "description": "Script for migrating data from Umami v1 to v2",
+  "author": "Umami Software, Inc. <hello@umami.is>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/umami-software/migrate-v1-v2.git"
+  },
+  "bugs": {
+    "url": "https://github.com/umami-software/migrate-v1-v2/issues"
+  },
+  "homepage": "https://github.com/umami-software/migrate-v1-v2#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "bin": {
+    "@umami/migrate-v1-v2": "index.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3"
+  }
+}
