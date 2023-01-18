@@ -21,14 +21,18 @@ function getDatabaseType(url = process.env.DATABASE_URL) {
 const databaseType = getDatabaseType();
 const prisma = new PrismaClient();
 
+function error(msg) {
+  console.log(chalk.redBright(`✗ ${msg}`));
+}
+
+function inProgress(msg) {
+  console.log(chalk.yellowBright(`✓ ${msg}`));
+}
+
 function success(msg) {
     console.log(chalk.greenBright(`✓ ${msg}`));
 }
   
-function error(msg) {
-    console.log(chalk.redBright(`✗ ${msg}`));
-}
-
 console.log(`Database type detected: ${databaseType}`);
 
 async function checkEnv() {
@@ -40,27 +44,27 @@ async function checkEnv() {
 }
 
 async function copyDbFiles() {
-    try {
-      const src = path.resolve(__dirname, `./db/${databaseType}`);
-      const dest = path.resolve(__dirname, './prisma');
-      
-      del.sync(dest);
-      
-      fse.copySync(src, dest);
-      
-      success(`Copied ${src} to ${dest}`);
-    } catch (e) {
-        throw new Error('Unable to copy db files.');
-    }
+  try {
+    const src = path.resolve(__dirname, `./db/${databaseType}`);
+    const dest = path.resolve(__dirname, './prisma');
+    
+    del.sync(dest);
+    
+    fse.copySync(src, dest);
+    
+    success(`Copied ${src} to ${dest}`);
+  } catch (e) {
+      throw new Error('Unable to copy db files.');
   }
+}
 
-  async function prismaGenerate() {
-    try {
-      console.log(execSync('prisma generate').toString());
-    } catch (e) {
-      throw new Error('Unable to run prisma generate.');
-    }
+async function prismaGenerate() {
+  try {
+    console.log(execSync('prisma generate').toString());
+  } catch (e) {
+    throw new Error('Unable to run prisma generate.');
   }
+}
 
 async function checkConnection() {
   try {
@@ -118,7 +122,7 @@ async function checkMigrationReady() {
 
 async function migrateData() {
   const filePath = `/prisma/data-migration-v2.sql`;
-  console.log('Starting v2 data migration. Please do no cancel this process, it may take a while.');
+  inProgress('Starting v2 data migration. Please do no cancel this process, it may take a while.');
   await runSqlFile(filePath);
 
   success('Data migration from V1 to V2 tables completed.');
