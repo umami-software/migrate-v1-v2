@@ -18,8 +18,6 @@ function getDatabaseType(url = process.env.DATABASE_URL) {
   return type;
 }
 
-const databaseType = getDatabaseType();
-
 function error(msg) {
   console.log(chalk.redBright(`✗ ${msg}`));
 }
@@ -32,8 +30,6 @@ function success(msg) {
     console.log(chalk.greenBright(`✓ ${msg}`));
 }
   
-console.log(`Database type detected: ${databaseType}`);
-
 async function checkEnv() {
   if (!process.env.DATABASE_URL) {
     throw new Error('DATABASE_URL is not defined.');
@@ -280,9 +276,14 @@ async function runSqlFile(filePath) {
   }
 }
 
+const databaseType = getDatabaseType();
+
+console.log(`Database type detected: ${databaseType}`);
+
 // copy prisma files and generate prisma client
 copyDbFiles()
 prismaGenerate()
+
 const prisma = new PrismaClient();
 
 // migration workflow
