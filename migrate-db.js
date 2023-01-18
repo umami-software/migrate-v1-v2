@@ -66,6 +66,7 @@ async function checkConnection() {
 
 async function checkV1Tables(databaseType) {
   try {
+    await prisma.$queryRaw`select * from account limit 1`;
     await prisma.$queryRaw`select * from _prisma_migrations where migration_name = '04_add_uuid' and finished_at IS NOT NULL`;
 
     console.log('Preparing v1 tables for migration');

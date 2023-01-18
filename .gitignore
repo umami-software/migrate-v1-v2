@@ -18,4 +18,5 @@ Thumbs.db
 # Project
 node_modules
 bin
+/prisma/
 
