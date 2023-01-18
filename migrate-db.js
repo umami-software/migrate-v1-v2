@@ -19,7 +19,6 @@ function getDatabaseType(url = process.env.DATABASE_URL) {
 }
 
 const databaseType = getDatabaseType();
-const prisma = new PrismaClient();
 
 function error(msg) {
   console.log(chalk.redBright(`✗ ${msg}`));
@@ -281,12 +280,16 @@ async function runSqlFile(filePath) {
   }
 }
 
+// copy prisma files and generate prisma client
+copyDbFiles()
+prismaGenerate()
+const prisma = new PrismaClient();
+
+// migration workflow
 (async () => {
   let err = false;
   for (let fn of [
     checkEnv,
-    copyDbFiles,
-    prismaGenerate,
     checkConnection,
     checkV1Tables,
     checkV2Tables,
