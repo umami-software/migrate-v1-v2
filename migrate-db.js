@@ -41,16 +41,24 @@ async function checkEnv() {
 
 async function copyDbFiles() {
     try {
-        const src = path.resolve(__dirname, `./db/${databaseType}`);
-        const dest = path.resolve(__dirname, './prisma');
-        
-        del.sync(dest);
-        
-        fse.copySync(src, dest);
-        
-        success(`Copied ${src} to ${dest}`);
+      const src = path.resolve(__dirname, `./db/${databaseType}`);
+      const dest = path.resolve(__dirname, './prisma');
+      
+      del.sync(dest);
+      
+      fse.copySync(src, dest);
+      
+      success(`Copied ${src} to ${dest}`);
     } catch (e) {
         throw new Error('Unable to copy db files.');
+    }
+  }
+
+  async function prismaGenerate() {
+    try {
+      console.log(execSync('prisma generate').toString());
+    } catch (e) {
+      throw new Error('Unable to run prisma generate.');
     }
   }
 
@@ -274,6 +282,7 @@ async function runSqlFile(filePath) {
   for (let fn of [
     checkEnv,
     copyDbFiles,
+    prismaGenerate,
     checkConnection,
     checkV1Tables,
     checkV2Tables,
