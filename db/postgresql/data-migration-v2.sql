@@ -46,12 +46,19 @@ WHERE NOT EXISTS (SELECT 1 FROM session);
 
 -- pageview
 INSERT INTO website_event
-(event_id, website_id, session_id, created_at, url, referrer, event_type)
+(event_id, website_id, session_id, created_at, url_path, url_query, referrer_path, referrer_query, referrer_domain, event_type)
 SELECT gen_random_uuid() event_id,
     w.website_uuid,
     s.session_uuid,
     p.created_at,
-    p.url,
+    CASE
+        WHEN position('?' in url) > 0 THEN substring(url, 0, position('?' in url))
+        ELSE url
+    END url_path,
+    CASE
+        WHEN position('?' in url) > 0 THEN substring(url, position('?' in url) + 1)
+        ELSE ''
+    END url_query
     p.referrer,
     1 event_type
 FROM v1_pageview p
@@ -63,12 +70,19 @@ WHERE NOT EXISTS (SELECT 1 FROM website_event WHERE event_type = 1);
 
 -- event / event_data
 INSERT INTO website_event
-(event_id, website_id, session_id, created_at, url, event_type, event_name, event_data)
+(event_id, website_id, session_id, created_at, url_path, url_query, event_type, event_name)
 SELECT e.event_uuid,
     w.website_uuid,
     s.session_uuid,
     e.created_at,
-    e.url,
+    CASE
+        WHEN position('?' in url) > 0 THEN substring(url, 0, position('?' in url))
+        ELSE url
+    END url_path,
+    CASE
+        WHEN position('?' in url) > 0 THEN substring(url, position('?' in url) + 1)
+        ELSE ''
+    END url_query
     2 event_type,
     e.event_name,
     ed.event_data
@@ -77,6 +91,4 @@ JOIN v1_session s
 ON s.session_id = e.session_id
 JOIN v1_website w
 ON w.website_id = s.website_id
-LEFT JOIN v1_event_data ed
-ON ed.event_id = e.event_id
 WHERE NOT EXISTS (SELECT 1 FROM website_event WHERE event_type = 2);

@@ -1,6 +1,3 @@
--- CreateExtension
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
-
 -- CreateTable
 CREATE TABLE "user" (
     "user_id" UUID NOT NULL,
@@ -25,6 +22,9 @@ CREATE TABLE "session" (
     "screen" VARCHAR(11),
     "language" VARCHAR(35),
     "country" CHAR(2),
+    "subdivision1" CHAR(3),
+    "subdivision2" VARCHAR(50),
+    "city" VARCHAR(50),
     "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "session_pkey" PRIMARY KEY ("session_id")
@@ -38,7 +38,6 @@ CREATE TABLE "website" (
     "share_id" VARCHAR(50),
     "rev_id" INTEGER NOT NULL DEFAULT 0,
     "user_id" UUID,
-    "team_id" UUID,
     "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ(6),
     "deleted_at" TIMESTAMPTZ(6),
@@ -52,24 +51,43 @@ CREATE TABLE "website_event" (
     "website_id" UUID NOT NULL,
     "session_id" UUID NOT NULL,
     "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
-    "url" VARCHAR(500) NOT NULL,
-    "referrer" VARCHAR(500),
+    "url_path" VARCHAR(500) NOT NULL,
+    "url_query" VARCHAR(500),
+    "referrer_path" VARCHAR(500),
+    "referrer_query" VARCHAR(500),
+    "referrer_domain" VARCHAR(500),
+    "page_title" VARCHAR(500),
     "event_type" INTEGER NOT NULL DEFAULT 1,
     "event_name" VARCHAR(50),
-    "event_data" JSONB,
 
     CONSTRAINT "website_event_pkey" PRIMARY KEY ("event_id")
+);
+
+-- CreateTable
+CREATE TABLE "event_data" (
+    "event_id" UUID NOT NULL,
+    "website_event_id" UUID NOT NULL,
+    "website_id" UUID NOT NULL,
+    "session_id" UUID NOT NULL,
+    "url_path" VARCHAR(500) NOT NULL,
+    "event_name" VARCHAR(500) NOT NULL,
+    "event_key" VARCHAR(500) NOT NULL,
+    "event_string_value" VARCHAR(500) NOT NULL,
+    "event_numeric_value" DECIMAL(19,4) NOT NULL,
+    "event_date_value" TIMESTAMPTZ(6),
+    "event_data_type" INTEGER NOT NULL,
+    "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "event_data_pkey" PRIMARY KEY ("event_id")
 );
 
 -- CreateTable
 CREATE TABLE "team" (
     "team_id" UUID NOT NULL,
     "name" VARCHAR(50) NOT NULL,
-    "user_id" UUID NOT NULL,
     "access_code" VARCHAR(50),
     "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ(6),
-    "deleted_at" TIMESTAMPTZ(6),
 
     CONSTRAINT "team_pkey" PRIMARY KEY ("team_id")
 );
@@ -82,9 +100,18 @@ CREATE TABLE "team_user" (
     "role" VARCHAR(50) NOT NULL,
     "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ(6),
-    "deleted_at" TIMESTAMPTZ(6),
 
     CONSTRAINT "team_user_pkey" PRIMARY KEY ("team_user_id")
+);
+
+-- CreateTable
+CREATE TABLE "team_website" (
+    "team_website_id" UUID NOT NULL,
+    "team_id" UUID NOT NULL,
+    "website_id" UUID NOT NULL,
+    "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "team_website_pkey" PRIMARY KEY ("team_website_id")
 );
 
 -- CreateIndex
@@ -107,9 +134,6 @@ CREATE UNIQUE INDEX "website_website_id_key" ON "website"("website_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "website_share_id_key" ON "website"("share_id");
-
--- CreateIndex
-CREATE INDEX "website_team_id_idx" ON "website"("team_id");
 
 -- CreateIndex
 CREATE INDEX "website_user_id_idx" ON "website"("user_id");
@@ -136,13 +160,31 @@ CREATE INDEX "website_event_website_id_created_at_idx" ON "website_event"("websi
 CREATE INDEX "website_event_website_id_session_id_created_at_idx" ON "website_event"("website_id", "session_id", "created_at");
 
 -- CreateIndex
+CREATE INDEX "event_data_created_at_idx" ON "event_data"("created_at");
+
+-- CreateIndex
+CREATE INDEX "event_data_session_id_idx" ON "event_data"("session_id");
+
+-- CreateIndex
+CREATE INDEX "event_data_website_id_idx" ON "event_data"("website_id");
+
+-- CreateIndex
+CREATE INDEX "event_data_website_event_id_idx" ON "event_data"("website_event_id");
+
+-- CreateIndex
+CREATE INDEX "event_data_website_id_website_event_id_created_at_idx" ON "event_data"("website_id", "website_event_id", "created_at");
+
+-- CreateIndex
+CREATE INDEX "event_data_website_id_session_id_created_at_idx" ON "event_data"("website_id", "session_id", "created_at");
+
+-- CreateIndex
+CREATE INDEX "event_data_website_id_session_id_website_event_id_created_a_idx" ON "event_data"("website_id", "session_id", "website_event_id", "created_at");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "team_team_id_key" ON "team"("team_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "team_access_code_key" ON "team"("access_code");
-
--- CreateIndex
-CREATE INDEX "team_user_id_idx" ON "team"("user_id");
 
 -- CreateIndex
 CREATE INDEX "team_access_code_idx" ON "team"("access_code");
@@ -155,3 +197,12 @@ CREATE INDEX "team_user_team_id_idx" ON "team_user"("team_id");
 
 -- CreateIndex
 CREATE INDEX "team_user_user_id_idx" ON "team_user"("user_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "team_website_team_website_id_key" ON "team_website"("team_website_id");
+
+-- CreateIndex
+CREATE INDEX "team_website_team_id_idx" ON "team_website"("team_id");
+
+-- CreateIndex
+CREATE INDEX "team_website_website_id_idx" ON "team_website"("website_id");
