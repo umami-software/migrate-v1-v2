@@ -1,3 +1,6 @@
+-- CreateExtension
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
 -- CreateTable
 CREATE TABLE "user" (
     "user_id" UUID NOT NULL,
@@ -36,7 +39,7 @@ CREATE TABLE "website" (
     "name" VARCHAR(100) NOT NULL,
     "domain" VARCHAR(500),
     "share_id" VARCHAR(50),
-    "rev_id" INTEGER NOT NULL DEFAULT 0,
+    "reset_at" TIMESTAMPTZ(6),
     "user_id" UUID,
     "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ(6),
@@ -66,14 +69,11 @@ CREATE TABLE "website_event" (
 -- CreateTable
 CREATE TABLE "event_data" (
     "event_id" UUID NOT NULL,
-    "website_event_id" UUID NOT NULL,
     "website_id" UUID NOT NULL,
-    "session_id" UUID NOT NULL,
-    "url_path" VARCHAR(500) NOT NULL,
-    "event_name" VARCHAR(500) NOT NULL,
+    "website_event_id" UUID NOT NULL,
     "event_key" VARCHAR(500) NOT NULL,
-    "event_string_value" VARCHAR(500) NOT NULL,
-    "event_numeric_value" DECIMAL(19,4) NOT NULL,
+    "event_string_value" VARCHAR(500),
+    "event_numeric_value" DECIMAL(19,4),
     "event_date_value" TIMESTAMPTZ(6),
     "event_data_type" INTEGER NOT NULL,
     "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
@@ -163,22 +163,10 @@ CREATE INDEX "website_event_website_id_session_id_created_at_idx" ON "website_ev
 CREATE INDEX "event_data_created_at_idx" ON "event_data"("created_at");
 
 -- CreateIndex
-CREATE INDEX "event_data_session_id_idx" ON "event_data"("session_id");
-
--- CreateIndex
 CREATE INDEX "event_data_website_id_idx" ON "event_data"("website_id");
 
 -- CreateIndex
 CREATE INDEX "event_data_website_event_id_idx" ON "event_data"("website_event_id");
-
--- CreateIndex
-CREATE INDEX "event_data_website_id_website_event_id_created_at_idx" ON "event_data"("website_id", "website_event_id", "created_at");
-
--- CreateIndex
-CREATE INDEX "event_data_website_id_session_id_created_at_idx" ON "event_data"("website_id", "session_id", "created_at");
-
--- CreateIndex
-CREATE INDEX "event_data_website_id_session_id_website_event_id_created_a_idx" ON "event_data"("website_id", "session_id", "website_event_id", "created_at");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "team_team_id_key" ON "team"("team_id");
