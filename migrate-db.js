@@ -133,6 +133,7 @@ async function dropV1Keys(databaseType) {
         prisma.$executeRaw`ALTER TABLE IF EXISTS event DROP CONSTRAINT IF EXISTS event_pkey CASCADE;`,
         prisma.$executeRaw`ALTER TABLE IF EXISTS session DROP CONSTRAINT IF EXISTS session_pkey CASCADE;`,
         prisma.$executeRaw`ALTER TABLE IF EXISTS website DROP CONSTRAINT IF EXISTS website_pkey CASCADE;`,
+        prisma.$executeRaw`ALTER TABLE IF EXISTS event_data DROP CONSTRAINT IF EXISTS event_data_pkey CASCADE;`,
       ]);
     } else {
       await prisma.$transaction([

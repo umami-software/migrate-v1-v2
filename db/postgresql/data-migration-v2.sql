@@ -36,7 +36,7 @@ SELECT session_uuid,
     screen,
     language,
     country,
-    created_at
+    s.created_at
 FROM v1_session s
 JOIN v1_website w
 ON w.website_id = s.website_id
@@ -50,9 +50,9 @@ SELECT gen_random_uuid() event_id,
     s.session_uuid,
     p.created_at,
     split_part(url, '?', 1) url_path,
-    split_part(url, '?', 2) url_query
+    split_part(url, '?', 2) url_query,
     CASE
-        WHEN position('://' in referrer) > 0 THEN REGEXP_REPLACE(split_part(referrer, '/', 3), '\:.*$', '')
+        WHEN position('://' in referrer) > 0 THEN REPLACE(REGEXP_REPLACE(split_part(referrer, '/', 3), '(\:.*$)', ''), 'www.', '')
         ELSE ''
     END referrer_domain,
     split_part(REGEXP_REPLACE(referrer, '(?:.*://)?(www\.)?([^/?]*)', ''), '?', 1) referrer_path,
