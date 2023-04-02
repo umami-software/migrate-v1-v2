@@ -51,12 +51,12 @@ SELECT gen_random_uuid() event_id,
     p.created_at,
     split_part(url, '?', 1) url_path,
     split_part(url, '?', 2) url_query,
+    split_part(REGEXP_REPLACE(referrer, '(?:.*://)?(www\.)?([^/?]*)', ''), '?', 1) referrer_path,
+    split_part(referrer, '?', 2) referrer_query,
     CASE
         WHEN position('://' in referrer) > 0 THEN REPLACE(REGEXP_REPLACE(split_part(referrer, '/', 3), '(\:.*$)', ''), 'www.', '')
         ELSE ''
     END referrer_domain,
-    split_part(REGEXP_REPLACE(referrer, '(?:.*://)?(www\.)?([^/?]*)', ''), '?', 1) referrer_path,
-    split_part(referrer, '?', 2) referrer_query,
     1 event_type
 FROM v1_pageview p
 JOIN v1_session s
