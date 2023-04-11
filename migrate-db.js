@@ -82,14 +82,16 @@ async function executeRawIgnore(sql) {
 async function checkV1Tables(databaseType) {
   try {
     await prisma.$queryRaw`select * from account limit 1`;
-    await prisma.$queryRaw`select * from _prisma_migrations where migration_name = '04_add_uuid' and finished_at IS NOT NULL`;
-
-    console.log('Preparing v1 tables for migration');
+    const record = await prisma.$queryRaw`select * from v1_prisma_migrations where migration_name = '04_add_uuid2' and finished_at IS NOT NULL`;
 
     // alter v1 tables
-    await dropV1Keys(databaseType);
-    await dropV1Indexes(databaseType);
-    await renameV1Tables(databaseType);
+    if (record.length > 0) {
+      console.log('Preparing v1 tables for migration');
+
+      await dropV1Keys(databaseType);
+      await dropV1Indexes(databaseType);
+      await renameV1Tables(databaseType);
+    }   
 
     success('Database v1 tables ready for migration.');
   } catch (e) {
@@ -212,15 +214,13 @@ async function renameV1Tables(databaseType) {
         prisma.$executeRaw`ALTER TABLE IF EXISTS website RENAME TO v1_website;`,
       ]);
     } else {
-      await prisma.$transaction([
-        prisma.$executeRaw`RENAME TABLE _prisma_migrations TO v1_prisma_migrations;`,
-        prisma.$executeRaw`RENAME TABLE account TO v1_account;`,
-        prisma.$executeRaw`RENAME TABLE event TO v1_event;`,
-        prisma.$executeRaw`RENAME TABLE event_data TO v1_event_data;`,
-        prisma.$executeRaw`RENAME TABLE pageview TO v1_pageview;`,
-        prisma.$executeRaw`RENAME TABLE session TO v1_session;`,
-        prisma.$executeRaw`RENAME TABLE website TO v1_website;`,
-      ]);
+        await executeRawIgnore('RENAME TABLE _prisma_migrations TO v1_prisma_migrations;');
+        await executeRawIgnore('RENAME TABLE account TO v1_account;');
+        await executeRawIgnore('RENAME TABLE event TO v1_event;');
+        await executeRawIgnore('RENAME TABLE event_data TO v1_event_data;');
+        await executeRawIgnore('RENAME TABLE pageview TO v1_pageview;');
+        await executeRawIgnore('RENAME TABLE session TO v1_session;');
+        await executeRawIgnore('RENAME TABLE website TO v1_website;');
     }
 
     success('Renamed v1 database tables.');
@@ -247,6 +247,18 @@ async function deleteV1TablesPrompt() {
   success('Migration successfully completed.');
 }
 
+async function deleteEventDataTable() {
+  try {
+    const record = await prisma.$queryRaw`select * from v1_event_data limit 1`;
+
+    if (record.length === 0) {
+      await prisma.$executeRaw`DROP TABLE IF EXISTS v1_event_data;`;
+    }
+  } catch (e) {
+     //Ignore
+  }
+}
+
 async function deleteV1Tables() {
   try {
     // drop tables
@@ -258,6 +270,8 @@ async function deleteV1Tables() {
       prisma.$executeRaw`DROP TABLE IF EXISTS v1_website;`,
       prisma.$executeRaw`DROP TABLE IF EXISTS v1_account;`,
     ]);
+
+    await deleteEventDataTable();
 
     success('Dropped v1 database tables.');
   } catch (e) {
