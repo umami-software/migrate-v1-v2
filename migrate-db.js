@@ -139,6 +139,7 @@ async function dropV1Keys(databaseType) {
       await prisma.$transaction([
         prisma.$executeRaw`ALTER TABLE session DROP FOREIGN KEY session_website_id_fkey;`,
         prisma.$executeRaw`ALTER TABLE website DROP FOREIGN KEY website_user_id_fkey;`,
+        prisma.$executeRaw`ALTER TABLE event_data DROP FOREIGN KEY event_data_event_id_fkey;`,
       ]);
     }
 
@@ -168,8 +169,13 @@ async function dropV1Indexes(databaseType) {
       await prisma.$transaction([
         prisma.$executeRaw`DROP INDEX session_created_at_idx ON session;`,
         prisma.$executeRaw`DROP INDEX session_website_id_idx ON session;`,
+        prisma.$executeRaw`DROP INDEX session_session_uuid_key ON session;`,
+        prisma.$executeRaw`DROP INDEX session_session_uuid_idx ON session;`,
         prisma.$executeRaw`DROP INDEX website_user_id_idx ON website;`,
         prisma.$executeRaw`DROP INDEX website_share_id_key ON website;`,
+        prisma.$executeRaw`DROP INDEX website_website_uuid_key ON website;`,
+        prisma.$executeRaw`DROP INDEX website_website_uuid_idx ON website;`,
+        prisma.$executeRaw`DROP INDEX event_data_event_id_key ON event_data;`,
       ]);
     }
 
@@ -235,7 +241,6 @@ async function deleteV1Tables() {
     // drop tables
     await prisma.$transaction([
       prisma.$executeRaw`DROP TABLE IF EXISTS v1_prisma_migrations;`,
-      prisma.$executeRaw`DROP TABLE IF EXISTS v1_event_data;`,
       prisma.$executeRaw`DROP TABLE IF EXISTS v1_event;`,
       prisma.$executeRaw`DROP TABLE IF EXISTS v1_pageview;`,
       prisma.$executeRaw`DROP TABLE IF EXISTS v1_session;`,
