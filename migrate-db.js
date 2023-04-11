@@ -71,6 +71,14 @@ async function checkConnection() {
   }
 }
 
+async function executeRawIgnore(sql) {
+  try {
+    await prisma.$executeRawUnsafe(sql);
+  } catch (e) {
+    // Ignore
+  }
+}
+
 async function checkV1Tables(databaseType) {
   try {
     await prisma.$queryRaw`select * from account limit 1`;
@@ -136,11 +144,9 @@ async function dropV1Keys(databaseType) {
         prisma.$executeRaw`ALTER TABLE IF EXISTS event_data DROP CONSTRAINT IF EXISTS event_data_pkey CASCADE;`,
       ]);
     } else {
-      await prisma.$transaction([
-        prisma.$executeRaw`ALTER TABLE session DROP FOREIGN KEY session_website_id_fkey;`,
-        prisma.$executeRaw`ALTER TABLE website DROP FOREIGN KEY website_user_id_fkey;`,
-        prisma.$executeRaw`ALTER TABLE event_data DROP FOREIGN KEY event_data_event_id_fkey;`,
-      ]);
+        await executeRawIgnore('ALTER TABLE session DROP FOREIGN KEY session_website_id_fkey;');
+        await executeRawIgnore('ALTER TABLE website DROP FOREIGN KEY website_user_id_fkey;');
+        await executeRawIgnore('ALTER TABLE event_data DROP FOREIGN KEY event_data_event_id_fkey;');
     }
 
     success('Dropped v1 database keys.');
@@ -161,22 +167,27 @@ async function dropV1Indexes(databaseType) {
         prisma.$executeRaw`DROP INDEX IF EXISTS session_website_id_idx;`,
         prisma.$executeRaw`DROP INDEX IF EXISTS website_website_id_key;`,
         prisma.$executeRaw`DROP INDEX IF EXISTS website_share_id_key;`,
+        prisma.$executeRaw`DROP INDEX IF EXISTS website_user_id_idx;`,
         prisma.$executeRaw`DROP INDEX IF EXISTS website_created_at_idx;`,
         prisma.$executeRaw`DROP INDEX IF EXISTS website_share_id_idx;`,
-        prisma.$executeRaw`DROP INDEX IF EXISTS website_user_id_idx;`,
+        prisma.$executeRaw`DROP INDEX IF EXISTS event_data_created_at_idx;`,
+        prisma.$executeRaw`DROP INDEX IF EXISTS event_data_website_id_idx;`,
+        prisma.$executeRaw`DROP INDEX IF EXISTS event_data_website_event_id_idx;`,
+        
       ]);
     } else {
-      await prisma.$transaction([
-        prisma.$executeRaw`DROP INDEX session_created_at_idx ON session;`,
-        prisma.$executeRaw`DROP INDEX session_website_id_idx ON session;`,
-        prisma.$executeRaw`DROP INDEX session_session_uuid_key ON session;`,
-        prisma.$executeRaw`DROP INDEX session_session_uuid_idx ON session;`,
-        prisma.$executeRaw`DROP INDEX website_user_id_idx ON website;`,
-        prisma.$executeRaw`DROP INDEX website_share_id_key ON website;`,
-        prisma.$executeRaw`DROP INDEX website_website_uuid_key ON website;`,
-        prisma.$executeRaw`DROP INDEX website_website_uuid_idx ON website;`,
-        prisma.$executeRaw`DROP INDEX event_data_event_id_key ON event_data;`,
-      ]);
+        await executeRawIgnore('DROP INDEX session_created_at_idx ON session;');
+        await executeRawIgnore('DROP INDEX session_website_id_idx ON session;');
+        await executeRawIgnore('DROP INDEX session_session_id_key ON session;');
+        await executeRawIgnore('DROP INDEX website_website_id_key ON website;');
+        await executeRawIgnore('DROP INDEX website_share_id_key ON website;');
+        await executeRawIgnore('DROP INDEX website_user_id_idx ON website;');
+        await executeRawIgnore('DROP INDEX website_created_at_idx ON website;');
+        await executeRawIgnore('DROP INDEX website_share_id_idx ON website;');
+        await executeRawIgnore('DROP INDEX event_data_created_at_idx ON event_data;');
+        await executeRawIgnore('DROP INDEX event_data_website_id_idx ON event_data;');
+        await executeRawIgnore('DROP INDEX event_data_website_event_id_idx ON event_data;');
+        await executeRawIgnore('DROP INDEX event_data_website_id_website_event_id_created_at_idx ON event_data;');
     }
 
     success('Dropped v1 database indexes.');
