@@ -82,7 +82,7 @@ async function executeRawIgnore(sql) {
 async function checkV1Tables(databaseType) {
   try {
     await prisma.$queryRaw`select * from account limit 1`;
-    const record = await prisma.$queryRaw`select * from v1_prisma_migrations where migration_name = '04_add_uuid2' and finished_at IS NOT NULL`;
+    const record = await prisma.$queryRaw`select * from _prisma_migrations where migration_name = '04_add_uuid' and finished_at IS NOT NULL`;
 
     // alter v1 tables
     if (record.length > 0) {
@@ -92,12 +92,21 @@ async function checkV1Tables(databaseType) {
       await dropV1Indexes(databaseType);
       await renameV1Tables(databaseType);
     }   
-
-    success('Database v1 tables ready for migration.');
   } catch (e) {
     // Ignore
   }
 }
+
+async function checkV1TablesReady() {
+  try {
+    await prisma.$queryRaw`select * from v1_account limit 1`;
+
+    success('Database v1 tables ready for migration.');
+  } catch (e) {
+    throw new Error('Database v1 tables is not ready for migration.');
+  }
+}
+
 
 async function checkV2Tables() {
   try {
@@ -324,6 +333,7 @@ const prisma = new PrismaClient();
     checkEnv,
     checkConnection,
     checkV1Tables,
+    checkV1TablesReady,
     checkV2Tables,
     checkMigrationReady,
     migrateData,
