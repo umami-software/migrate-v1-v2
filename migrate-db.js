@@ -43,7 +43,7 @@ async function copyDbFiles() {
     const src = path.resolve(__dirname, `./db/${databaseType}`);
     const dest = path.resolve(__dirname, './prisma');
     
-    del.sync(dest);
+    del.sync(dest, {force: true});
     
     fse.copySync(src, dest);
     
