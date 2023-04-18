@@ -18,6 +18,7 @@ Script for migrating data from Umami v1 to v2.
 ```shell
 git clone https://github.com/umami-software/migrate-v1-v2.git
 cd migrate-v1-v2
+yarn install
 yarn build
 ```
 
