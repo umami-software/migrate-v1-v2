@@ -318,6 +318,10 @@ async function runSqlFile(filePath) {
   }
 }
 
+function delay(time) {
+  return new Promise(resolve => setTimeout(resolve, time));
+}
+
 // migration workflow
 (async () => {
   databaseType = getDatabaseType();
@@ -327,6 +331,7 @@ async function runSqlFile(filePath) {
   // copy prisma files and generate prisma client
   await copyDbFiles(databaseType);
   await prismaGenerate();
+  await delay(5000);
 
   const { PrismaClient } = require('@prisma/client');
   prisma = new PrismaClient();
