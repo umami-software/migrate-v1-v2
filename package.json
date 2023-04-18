@@ -1,6 +1,6 @@
 {
   "name": "@umami/migrate-v1-v2",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Script for migrating data from Umami v1 to v2",
   "author": "Umami Software, Inc. <hello@umami.is>",
   "license": "MIT",
@@ -16,7 +16,7 @@
     "access": "public"
   },
   "bin": {
-    "@umami/migrate-v1-v2": "migrate-db.js"
+    "@umami/migrate-v1-v2": "index.js"
   },
   "dependencies": {
     "@prisma/client": "4.11.0",
@@ -25,9 +25,7 @@
     "dotenv": "^10.0.0",
     "fs-extra": "^10.0.1",
     "npm-run-all": "^4.1.5",
+    "prisma": "4.11.0",
     "prompts": "2.4.2"
-  },
-  "devDependencies": {
-    "prisma": "4.11.0"
   }
 }
