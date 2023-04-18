@@ -13,6 +13,20 @@ Script for migrating data from Umami v1 to v2.
 - The script will ask you if you want to drop your v1 tables after the migration is complete.
 - If an `event_data` table is found populated with data, it will be renamed to `v1_event_data` but not dropped.
 
+## Running migration
+
+There are two ways to run the migration script.
+
+### 1. Running inside the Umami folder
+
+```shell
+cd umami
+yarn add @umami/migrate-v1-v2
+npx @umami/migrate-v1-v2
+```
+
+### 2. Running standalone
+
 ### Install
 
 ```shell
