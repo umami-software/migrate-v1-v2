@@ -86,7 +86,7 @@ async function checkV2Tables() {
     console.log('Adding v2 tables...');
 
     // run v2 prisma migration steps
-    await runSqlFile('/prisma/migrations/01_init/migration.sql');
+    await runSqlFile(`/db/${databaseType}/migrations/01_init/migration.sql`);
     console.log(execSync('npx prisma migrate resolve --applied 01_init').toString());
   }
 }
@@ -103,7 +103,7 @@ async function checkMigrationReady() {
 }
 
 async function migrateData() {
-  const filePath = `/prisma/data-migration-v2.sql`;
+  const filePath = `/db/${databaseType}/data-migration-v2.sql`;
   inProgress('Starting v2 data migration. Please do no cancel this process, it may take a while.');
   await runSqlFile(filePath);
 
