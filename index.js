@@ -121,6 +121,7 @@ async function dropV1Keys(databaseType) {
         prisma.$executeRaw`ALTER TABLE IF EXISTS session DROP CONSTRAINT IF EXISTS session_pkey CASCADE;`,
         prisma.$executeRaw`ALTER TABLE IF EXISTS website DROP CONSTRAINT IF EXISTS website_pkey CASCADE;`,
         prisma.$executeRaw`ALTER TABLE IF EXISTS event_data DROP CONSTRAINT IF EXISTS event_data_pkey CASCADE;`,
+        prisma.$executeRaw`ALTER TABLE IF EXISTS website DROP CONSTRAINT IF EXISTS website_share_id_key CASCADE;`,
       ]);
     } else {
         await executeRawIgnore('ALTER TABLE session DROP FOREIGN KEY session_website_id_fkey;');
@@ -145,7 +146,6 @@ async function dropV1Indexes(databaseType) {
         prisma.$executeRaw`DROP INDEX IF EXISTS session_created_at_idx;`,
         prisma.$executeRaw`DROP INDEX IF EXISTS session_website_id_idx;`,
         prisma.$executeRaw`DROP INDEX IF EXISTS website_website_id_key;`,
-        prisma.$executeRaw`DROP INDEX IF EXISTS website_share_id_key;`,
         prisma.$executeRaw`DROP INDEX IF EXISTS website_user_id_idx;`,
         prisma.$executeRaw`DROP INDEX IF EXISTS website_created_at_idx;`,
         prisma.$executeRaw`DROP INDEX IF EXISTS website_share_id_idx;`,
