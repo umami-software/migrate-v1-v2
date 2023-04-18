@@ -55,7 +55,7 @@ async function copyDbFiles() {
 
 async function prismaGenerate() {
   try {
-    console.log(execSync('prisma generate').toString());
+    console.log(execSync('npx prisma generate').toString());
   } catch (e) {
     throw new Error('Unable to run prisma generate.');
   }
@@ -119,7 +119,7 @@ async function checkV2Tables() {
 
     // run v2 prisma migration steps
     await runSqlFile('/prisma/migrations/01_init/migration.sql');
-    console.log(execSync('prisma migrate resolve --applied 01_init').toString());
+    console.log(execSync('npx prisma migrate resolve --applied 01_init').toString());
   }
 }
 
