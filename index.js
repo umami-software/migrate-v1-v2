@@ -2,10 +2,10 @@
 require('dotenv').config();
 const fse = require('fs-extra');
 const path = require('path');
-const del = require('del');
-const chalk = require('chalk');
 const { execSync } = require('child_process');
 const prompts = require('prompts');
+const { PrismaClient } = require('@prisma/client');
+const { success, error, inProgress } = require('./common');
 
 let prisma;
 let databaseType;
@@ -20,46 +20,12 @@ function getDatabaseType(url = process.env.DATABASE_URL) {
   return type;
 }
 
-function error(msg) {
-  console.log(chalk.redBright(`✗ ${msg}`));
-}
-
-function inProgress(msg) {
-  console.log(chalk.yellowBright(`✓ ${msg}`));
-}
-
-function success(msg) {
-    console.log(chalk.greenBright(`✓ ${msg}`));
-}
   
 async function checkEnv() {
   if (!process.env.DATABASE_URL) {
     throw new Error('DATABASE_URL is not defined.');
   } else {
     success('DATABASE_URL is defined.');
-  }
-}
-
-async function copyDbFiles(databaseType) {
-  try {
-    const src = path.resolve(__dirname, `./db/${databaseType}`);
-    const dest = path.resolve(__dirname, './prisma');
-    
-    del.sync(dest, {force: true});
-    
-    fse.copySync(src, dest);
-    
-    success(`Copied ${src} to ${dest}`);
-  } catch (e) {
-      throw new Error('Unable to copy db files. ' + e.message);
-  }
-}
-
-async function prismaGenerate() {
-  try {
-    console.log(execSync('npx prisma generate').toString());
-  } catch (e) {
-    throw new Error('Unable to run prisma generate: ' + e.message);
   }
 }
 
@@ -325,15 +291,6 @@ function delay(time) {
 // migration workflow
 (async () => {
   databaseType = getDatabaseType();
-
-  console.log(`Database type detected: ${databaseType}`);
-
-  // copy prisma files and generate prisma client
-  await copyDbFiles(databaseType);
-  await prismaGenerate();
-  await delay(5000);
-
-  const { PrismaClient } = require('@prisma/client');
   prisma = new PrismaClient();
 
   let err = false;

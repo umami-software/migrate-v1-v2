@@ -1,6 +1,6 @@
 {
   "name": "@umami/migrate-v1-v2",
-  "version": "0.7.0",
+  "version": "0.9.0",
   "description": "Script for migrating data from Umami v1 to v2",
   "author": "Umami Software, Inc. <hello@umami.is>",
   "license": "MIT",
@@ -15,8 +15,9 @@
   "publishConfig": {
     "access": "public"
   },
-  "bin": {
-    "@umami/migrate-v1-v2": "index.js"
+  "scripts": {
+    "build": "node build.js",
+    "start": "node index.js"
   },
   "dependencies": {
     "@prisma/client": "4.11.0",
