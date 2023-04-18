@@ -316,18 +316,18 @@ async function runSqlFile(filePath) {
   }
 }
 
-const databaseType = getDatabaseType();
-
-console.log(`Database type detected: ${databaseType}`);
-
-// copy prisma files and generate prisma client
-copyDbFiles()
-prismaGenerate()
-
-const prisma = new PrismaClient();
-
 // migration workflow
 (async () => {
+  const databaseType = getDatabaseType();
+
+  console.log(`Database type detected: ${databaseType}`);
+
+  // copy prisma files and generate prisma client
+  await copyDbFiles();
+  await prismaGenerate();
+
+  const prisma = new PrismaClient();
+
   let err = false;
   for (let fn of [
     checkEnv,
