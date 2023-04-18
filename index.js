@@ -146,6 +146,7 @@ async function dropV1Indexes(databaseType) {
         prisma.$executeRaw`DROP INDEX IF EXISTS session_created_at_idx;`,
         prisma.$executeRaw`DROP INDEX IF EXISTS session_website_id_idx;`,
         prisma.$executeRaw`DROP INDEX IF EXISTS website_website_id_key;`,
+        prisma.$executeRaw`DROP INDEX IF EXISTS website_share_id_key;`,
         prisma.$executeRaw`DROP INDEX IF EXISTS website_user_id_idx;`,
         prisma.$executeRaw`DROP INDEX IF EXISTS website_created_at_idx;`,
         prisma.$executeRaw`DROP INDEX IF EXISTS website_share_id_idx;`,
