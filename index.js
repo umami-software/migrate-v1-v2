@@ -3,10 +3,12 @@ require('dotenv').config();
 const fse = require('fs-extra');
 const path = require('path');
 const del = require('del');
-const { PrismaClient } = require('@prisma/client');
 const chalk = require('chalk');
 const { execSync } = require('child_process');
 const prompts = require('prompts');
+
+let prisma;
+let databaseType;
 
 function getDatabaseType(url = process.env.DATABASE_URL) {
   const type = process.env.DATABASE_TYPE || (url && url.split(':')[0]);
@@ -38,7 +40,7 @@ async function checkEnv() {
   }
 }
 
-async function copyDbFiles() {
+async function copyDbFiles(databaseType) {
   try {
     const src = path.resolve(__dirname, `./db/${databaseType}`);
     const dest = path.resolve(__dirname, './prisma');
@@ -49,7 +51,7 @@ async function copyDbFiles() {
     
     success(`Copied ${src} to ${dest}`);
   } catch (e) {
-      throw new Error('Unable to copy db files.');
+      throw new Error('Unable to copy db files. ' + e.message);
   }
 }
 
@@ -57,7 +59,7 @@ async function prismaGenerate() {
   try {
     console.log(execSync('npx prisma generate').toString());
   } catch (e) {
-    throw new Error('Unable to run prisma generate.');
+    throw new Error('Unable to run prisma generate: ' + e.message);
   }
 }
 
@@ -67,7 +69,7 @@ async function checkConnection() {
 
     success('Database connection successful.');
   } catch (e) {
-    throw new Error('Unable to connect to the database.');
+    throw new Error('Unable to connect to the database:' + e.message);
   }
 }
 
@@ -79,7 +81,7 @@ async function executeRawIgnore(sql) {
   }
 }
 
-async function checkV1Tables(databaseType) {
+async function checkV1Tables() {
   try {
     await prisma.$queryRaw`select * from account limit 1`;
     const record = await prisma.$queryRaw`select * from _prisma_migrations where migration_name = '04_add_uuid' and finished_at IS NOT NULL`;
@@ -103,7 +105,7 @@ async function checkV1TablesReady() {
 
     success('Database v1 tables ready for migration.');
   } catch (e) {
-    throw new Error('Database v1 tables is not ready for migration.');
+    throw new Error('Database v1 tables are not ready for migration.');
   }
 }
 
@@ -318,15 +320,16 @@ async function runSqlFile(filePath) {
 
 // migration workflow
 (async () => {
-  const databaseType = getDatabaseType();
+  databaseType = getDatabaseType();
 
   console.log(`Database type detected: ${databaseType}`);
 
   // copy prisma files and generate prisma client
-  await copyDbFiles();
+  await copyDbFiles(databaseType);
   await prismaGenerate();
 
-  const prisma = new PrismaClient();
+  const { PrismaClient } = require('@prisma/client');
+  prisma = new PrismaClient();
 
   let err = false;
   for (let fn of [
@@ -340,7 +343,7 @@ async function runSqlFile(filePath) {
     deleteV1TablesPrompt,
   ]) {
     try {
-      fn.name === 'checkV1Tables' ? await fn(databaseType) : await fn();
+      await fn();
     } catch (e) {
       error(e.message);
       err = true;
