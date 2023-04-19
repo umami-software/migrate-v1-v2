@@ -71,7 +71,7 @@ async function checkV1TablesReady() {
 
     success('Database v1 tables ready for migration.');
   } catch (e) {
-    throw new Error('No v1 tables were found.');
+    throw new Error('Database v1 tables have not been detected.');
   }
 }
 
