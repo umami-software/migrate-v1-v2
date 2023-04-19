@@ -6,6 +6,7 @@ const { execSync } = require('child_process');
 const prompts = require('prompts');
 const { PrismaClient } = require(path.resolve(process.cwd(), 'node_modules/@prisma/client'));
 const { success, error, inProgress } = require('./common');
+const pkg = require('./package.json');
 
 let prisma;
 let databaseType;
@@ -291,6 +292,8 @@ function delay(time) {
 
 // migration workflow
 (async () => {
+  console.log(`Running v${pkg.version}`);
+
   databaseType = getDatabaseType();
   prisma = new PrismaClient();
 
