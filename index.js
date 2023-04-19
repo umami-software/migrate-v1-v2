@@ -4,7 +4,7 @@ const fse = require('fs-extra');
 const path = require('path');
 const { execSync } = require('child_process');
 const prompts = require('prompts');
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient } = require(path.resolve(process.cwd(), 'node_modules/@prisma/client'));
 const { success, error, inProgress } = require('./common');
 
 let prisma;
@@ -71,7 +71,7 @@ async function checkV1TablesReady() {
 
     success('Database v1 tables ready for migration.');
   } catch (e) {
-    throw new Error('Database v1 tables are not ready for migration.');
+    throw new Error('No v1 tables were found.');
   }
 }
 
