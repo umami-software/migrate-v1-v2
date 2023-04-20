@@ -108,7 +108,7 @@ async function migrateData() {
   inProgress('Starting v2 data migration. Please do no cancel this process, it may take a while.');
   await runSqlFile(filePath);
 
-  success('Data migration from V1 to V2 tables completed.');
+  success('Data migration from v1 to v2 tables completed.');
 }
 
 async function dropV1Keys(databaseType) {
@@ -214,7 +214,7 @@ async function deleteV1TablesPrompt() {
   const response = await prompts({
     type: 'text',
     name: 'value',
-    message: 'Do you want to delete V1 database tables? (Y/N)',
+    message: 'Do you want to delete v1 database tables? (Y/N)',
     validate: value =>
       value.toUpperCase() !== 'Y' && value.toUpperCase() !== 'N' ? `Please enter Y or N.` : true,
   });
@@ -284,10 +284,6 @@ async function runSqlFile(filePath) {
     console.log(e);
     throw new Error(`Failed to run sql file ${filePath}.`);
   }
-}
-
-function delay(time) {
-  return new Promise(resolve => setTimeout(resolve, time));
 }
 
 // migration workflow
