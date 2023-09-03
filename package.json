@@ -23,12 +23,12 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "@prisma/client": "4.11.0",
+    "@prisma/client": "4.16.2",
     "chalk": "^4.1.1",
     "del": "^6.0.0",
     "dotenv": "^10.0.0",
     "fs-extra": "^10.0.1",
-    "prisma": "4.11.0",
+    "prisma": "4.16.2",
     "prompts": "2.4.2"
   }
 }
